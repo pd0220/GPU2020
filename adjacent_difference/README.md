@@ -1,4 +1,4 @@
-# GPU2020
+# GPU2020_adjacent_difference
 
 Scientific Programming of Graphical Processors course, ELTE, 2020
 
