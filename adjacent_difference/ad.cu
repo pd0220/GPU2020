@@ -3,6 +3,7 @@
 #include <iostream>
 #include <numeric>
 #include <algorithm>
+#include <random>
 
 // kernel
 __global__ void adjacent_difference(int n, float *x)
@@ -11,10 +12,8 @@ __global__ void adjacent_difference(int n, float *x)
 	int i = blockIdx.x * blockDim.x + threadIdx.x;
 	// run algorithm
 	// first element ~ do nothing
-	if (i == 0)
-		x[i] = x[i];
 	// rest of the elements ~ compute differences
-	if (i < n)
+	if (i < n && i != 0)
 	{
 		x[i] = x[i] - x[i - 1];
 	}
@@ -23,12 +22,23 @@ __global__ void adjacent_difference(int n, float *x)
 // main function
 int main(int, char **)
 {
+	// random number generation
+	std::random_device rd{};
+	std::mt19937 gen(rd());
+	std::normal_distribution<float> distr(-10.f, 10.f);
+
+	auto rand = [&distr, &gen]() {
+		return (float)distr(gen);
+	};
+
+	// size
+	size_t size = (int)std::pow(2, 17);
+
 	// test vectors
-	std::vector<float> XVec{2.f, 4.f, 6.f, 8.f, 10.f, 12.f, 14.f, 16.f, 18.f, 20.f};
+	std::vector<float> XVec(size);
+	std::generate(XVec.begin(), XVec.end(), rand);
 	std::vector<float> ResultVec(XVec.size());
 
-	// sizes
-	size_t size = XVec.size();
 	// vectors for devcie
 	float *devX = nullptr;
 
@@ -50,8 +60,8 @@ int main(int, char **)
 	}
 
 	// grid and block dimensions
-	dim3 dimGrid(1);
-	dim3 dimBlock(static_cast<int>(size));
+	dim3 dimGrid(size / 1024, 1);
+	dim3 dimBlock(1024, 1);
 
 	// start kernel
 	adjacent_difference<<<dimGrid, dimBlock>>>((int)size, devX);
@@ -81,10 +91,12 @@ int main(int, char **)
 	}
 
 	// write results to screen
+	/*
 	for (auto r : ResultVec)
 	{
 		std::cout << r << std::endl;
 	}
+	*/
 
 	// repeat on CPU tp validate results
 	std::adjacent_difference(XVec.begin(), XVec.end(), XVec.begin());
@@ -96,7 +108,7 @@ int main(int, char **)
 	}
 	else
 	{
-		std::cout << "Mismatch between CPU and GPU results." << std::endl;;
+		std::cout << "Mismatch between CPU and GPU results." << std::endl;
 	}
 
 	// this is the way
