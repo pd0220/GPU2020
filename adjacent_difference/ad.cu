@@ -32,7 +32,7 @@ int main(int, char **)
 	};
 
 	// size
-	size_t size = (int)std::pow(2, 17);
+	size_t size = (int)(1000 * 1000);
 
 	// test vectors
 	std::vector<float> XVec(size);
@@ -60,8 +60,8 @@ int main(int, char **)
 	}
 
 	// grid and block dimensions
-	dim3 dimGrid(size / 1024, 1);
-	dim3 dimBlock(1024, 1);
+	dim3 dimGrid(size / 1000, 1);
+	dim3 dimBlock(1000, 1);
 
 	// start kernel
 	adjacent_difference<<<dimGrid, dimBlock>>>((int)size, devX);
