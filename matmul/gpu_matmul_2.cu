@@ -10,7 +10,7 @@
 #include "cpu_matmul.h"
 
 // gpu matrix block size 1
-static const int MBS1 = 16;
+static const int MBS1 = 32;
 // gpu matrix block size 2
 static const int MBS2 = MBS1 / 2;
 

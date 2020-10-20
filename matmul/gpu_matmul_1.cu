@@ -10,7 +10,7 @@
 #include "cpu_matmul.h"
 
 // matrix block size
-static const int MBS = 16;
+static const int MBS = 32;
 
 // kernel
 __global__ void matmul_improved(float *C, float *A, float *B, int N)
